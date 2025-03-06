@@ -6,11 +6,13 @@ from scipy.stats import kruskal
 import scipy.stats as stats
 from sklearn.preprocessing import OneHotEncoder
 
+#kruskal_test function to be used to test if categorical feature has an effect on the profit or not
 def kruskal_test(feature, data):
     groups = [data[data[feature] == group]['Profit'] for group in data[feature].unique()]
     stat, p_value = kruskal(*groups)
     return p_value
 
+#cramers V matrix to measure correlation between categorical features
 def cramers_v_matrix(df, categorical_features):
     # Computes the Cramér's V correlation matrix for categorical features in a DataFrame.
     # Parameters:
@@ -37,7 +39,7 @@ def cramers_v_matrix(df, categorical_features):
             cramers_v_df.loc[col2, col1] = cramers_v_df.loc[col1, col2]  # Symmetric matrix
 
     return cramers_v_df
-
+#for plotting the heatmap results of cramers V correlation matrix
 def plot_cramers_v_heatmap(cramers_v_df):
     # Plots a heatmap of the Cramér's V correlation matrix.
     # Parameters:
@@ -47,6 +49,7 @@ def plot_cramers_v_heatmap(cramers_v_df):
     plt.title("Cramér's V Heatmap (Categorical Feature Correlation)")
     plt.show()
 
+#a preprocessing data function to properly drop the unnecessary columns for training/inference
 def preprocess_Data(df):
     #creating new more predictive features
     df["Discounted_Sales"] = df["Sales"] * (1 - df["Discount"])

@@ -19,6 +19,7 @@ y = df['Profit']
 #split data for validation
 X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=42)
 
+#define objective function for optuna to use (identify hyperparameters to be tuned)
 def objective(trial):
     # Suggest values for hyperparameters
     param = {

@@ -11,6 +11,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsRegressor
 import lightgbm as lgb
 from utils import preprocess_Data
+
 #load dataset
 df = pd.read_csv("stores_sales_forecasting.csv", encoding="utf-8" , encoding_errors="ignore")
 #preprocess data
@@ -21,6 +22,7 @@ y = df['Profit']
 #split into train and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+#make lists to store the values for future analysis
 RootMeanSqErr = []
 R2scores = []
 
@@ -34,12 +36,13 @@ y_pred = model_LR.predict(X_test)
 
 #mean squared error
 mse = np.sqrt(mean_squared_error(y_test, y_pred))
-# range_y = np.max(y_test)-np.min(y_test)
+# range_y = np.max(y_test)-np.min(y_test) #for noramlizing rsme
 # mse = mse/range_y
 
 print("Linear Regression RMSE:", mse)
 r2 = r2_score(y_test, y_pred)
 print("Linear Regression R²:", r2)
+
 #add to lists for comparison
 RootMeanSqErr.append(('Linear Regression (baseline)', mse))
 R2scores.append(('Linear Regression (baseline)', r2))
@@ -56,6 +59,7 @@ mse_RF = np.sqrt(mean_squared_error(y_test, y_pred))
 print("Random Forest RMSE:", mse_RF)
 r2_rf = r2_score(y_test, y_pred)
 print("Random Forest R²:", r2_score(y_test, y_pred))
+
 #add results to lists
 RootMeanSqErr.append(('Random Forest', mse_RF))
 R2scores.append(('Random Forest', r2_rf))

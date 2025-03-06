@@ -19,34 +19,34 @@ y = df['Profit']
 #split into train and test sets 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Load best hyperparameters
+#Load best hyperparameters
 with open("best_hyperparameters_XGBoost.json", "r") as f:
     best_params = json.load(f)
 
-# Train the XGBoost model
+#Train the XGBoost model
 model = xgb.XGBRegressor(**best_params)
 model.fit(X_train, y_train)
 
-# Evaluate on validation set
+#Evaluate on validation set
 y_pred = model.predict(X_test)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 print(f"Validation RMSE: {rmse}")
 
-# Save the trained model
+#Save the trained model
 joblib.dump(model, "xgb_model.pkl")
 print("Model saved as xgb_model.pkl")    
 
-# Save RMSE to a log file
+#Save RMSE to a log file
 log_data = {"RMSE": rmse, "best_hyperparameters": best_params}
 with open("training_log.json", "w") as f:
     json.dump(log_data, f, indent=4)
 print("📄 Training log saved as training_log.json")
 
-# 🔹 Plot Feature Importance
+#Plot Feature Importance
 feature_importance = model.feature_importances_
 feature_names = X.columns
 
-# Sort features by importance
+#Sort features by importance
 sorted_idx = np.argsort(feature_importance)[::-1]
 
 plt.figure(figsize=(10, 6))
