@@ -14,13 +14,13 @@ df = df.drop(columns=["Row ID", 'Order ID', 'Customer Name', 'State', 'Postal Co
 #first I handle the inconsistant data type of the order date and engineer it into day, year, week, day of week
 
 #convert Order Data to datetime
-df['Order Date'] = pd.to_datetime(df['Order Date'])
+# df['Order Date'] = pd.to_datetime(df['Order Date'])
 
-#extract year, month and day
-df['Order Year'] = df['Order Date'].dt.year
-df['Order Month'] = df['Order Date'].dt.month
-df['Order Day'] = df['Order Date'].dt.day
-df['Order Day of Week'] = df['Order Date'].dt.dayofweek
+# #extract year, month and day
+# df['Order Year'] = df['Order Date'].dt.year
+# df['Order Month'] = df['Order Date'].dt.month
+# df['Order Day'] = df['Order Date'].dt.day
+# df['Order Day of Week'] = df['Order Date'].dt.dayofweek
 
 #so the date has been transformed into features more digestable
 #drop order date since it has been transformed
@@ -56,20 +56,21 @@ df["Profit_Margin"] = (df["Profit"] / df["Sales"]) * 100
 
 #now we must check which features are correlated with the profit and which are correlated with each other
 #calculate Pearson correlation for numerical features
-numerical_features = ['Sales', 'Quantity', 'Discount', 'Order Year', 'Order Month', 'Order Day', 'Order Day of Week', 
-                      'Purchase Count', 'Discounted_Sales', 'Price_per_Unit', 'Discount_Impact', 'Log_Sales', 'Profit_Margin']
-correlation_matrix = df[numerical_features + ['Profit']].corr()
+numerical_features_original = ['Sales', 'Quantity', 'Discount']
+numerical_features = ['Sales', 'Quantity', 'Discount', 'Purchase Count', 'Discounted_Sales', 
+                      'Price_per_Unit', 'Discount_Impact', 'Log_Sales', 'Profit_Margin']
+correlation_matrix = df[numerical_features_original + ['Profit']].corr()
 
 #display correlation with Profit
 #print(correlation_matrix['Profit'].sort_values(ascending=False))
 #Plot correlation heatmap
 plt.figure(figsize=(10, 8))
 sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
-plt.title('Correlation Heatmap for Numerical Features')
+plt.title('Correlation Heatmap for Original Numerical Features')
 plt.show()
 
 #this plot showed that only sales and discount and quantity (through the sales) are correlated with the profit
-df = df.drop(columns=['Order Year', 'Order Month', 'Order Day', 'Order Day of Week', 'Purchase Count'], axis = 1)
+df = df.drop(columns=['Purchase Count'], axis = 1)
 
 #Drop the same columns from numerical_features and regraph the correlation matrix for clarity
 numerical_features = [col for col in numerical_features if col not in ['Order Year', 'Order Month', 'Order Day', 
