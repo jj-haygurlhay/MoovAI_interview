@@ -1,14 +1,7 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import shap
 import matplotlib.pyplot as plt
-from scipy.stats import kruskal
-import scipy.stats as stats
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
-from utils import kruskal_test, cramers_v_matrix, plot_cramers_v_heatmap
 
 #load the dataset
 df = pd.read_csv("stores_sales_forecasting.csv", encoding="utf-8" , encoding_errors="ignore")
@@ -101,72 +94,3 @@ plt.figure(figsize=(10, 8))
 sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
 plt.title('Correlation Heatmap for Numerical Features III')
 plt.show()
-#now that we performed a little feature engineering and selection it is time to handle the categorical features
-categorical_features = ['Ship Mode', 'Segment', 'City', 'Region', 'Product ID', 'Sub-Category']
-
-#count unique values in each categorical feature
-unique_counts = df[categorical_features].nunique()
-
-#display the results
-# print(f"{unique_counts}")
-#this showed there was only one country and one category so we dropped them
-#kruskal wallis test since not all categorical features are normally distributed and some have a high cardinality
-results = {}
-for feature in categorical_features:
-    p_value = kruskal_test(feature, df)
-    results[feature] = p_value
-
-# Display results
-for feature, p in results.items():
-    print(f'{feature}: p = {p:.75f}')
-
-#results: 
-# Ship Mode: p = 0.640858963297465056285773243871517479419708251953125000000000000000000000000
-# Segment: p = 0.742699787038433312247320827736984938383102416992187500000000000000000000000
-# City: p = 0.000000000000000000000000000000000000000000000000000023089338702713992344369
-# Region: p = 0.000000000000000000000000000044424002269190497763936303631559434345376292876
-# Product ID: p = 0.000000000000000000000000000022376522647010394838752697270770256555481716113
-# Sub-Category: p = 0.000000000000000000000093684050427002657401091624321469457277740266003712670
-# -> drop ship mode and segment
-df = df.drop(columns=['Ship Mode', 'Segment'], axis=1)
-
-categorical_features = ['City', 'Region', 'Product ID', 'Sub-Category']
-
-#using cramers V to determine correlation between these remaining categorical features 
-cramers_v_results = cramers_v_matrix(df, categorical_features)
-plot_cramers_v_heatmap(cramers_v_results)
-
-#results showed city and region and product ID and sub category are correlated
-df = df.drop(columns=['City','Product ID'], axis=1)
-#now we are using mutual info regression to test feature importance 
-print(df.head(10))
-
-#check data types
-print(df.info())
-
-#SHAP
-#convert Region and Sub-Category into numerical values using one-hot encoding
-categorical_features = ['Region', 'Sub-Category']
-
-#one-Hot Encode categorical variables
-df = pd.get_dummies(df, columns=categorical_features, drop_first=True)
-
-X = df.drop(columns=['Profit'])  # Drop target column
-X = X.astype({col: int for col in X.select_dtypes('bool').columns})
-y = df['Profit']
-
-#Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-#Train a RandomForestRegressor
-rf = RandomForestRegressor(n_estimators=100, random_state=42)
-rf.fit(X_train, y_train)
-
-#Initialize SHAP TreeExplainer (for random forest Regressor)
-explainer = shap.TreeExplainer(rf)
-shap_values = explainer(X_test)
-
-#Plot SHAP summary plot
-shap.summary_plot(shap_values, X_test)
-
-

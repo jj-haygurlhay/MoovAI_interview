@@ -44,8 +44,8 @@ r2 = r2_score(y_test, y_pred)
 print("Linear Regression R²:", r2)
 
 #add to lists for comparison
-RootMeanSqErr.append(('Linear Regression (baseline)', mse))
-R2scores.append(('Linear Regression (baseline)', r2))
+RootMeanSqErr.append(('Lin Reg', mse))
+R2scores.append(('Lin Reg', r2))
 
 #RandomForestRegressor
 model_RF = RandomForestRegressor(n_estimators=100, random_state=42)
@@ -61,8 +61,8 @@ r2_rf = r2_score(y_test, y_pred)
 print("Random Forest R²:", r2_score(y_test, y_pred))
 
 #add results to lists
-RootMeanSqErr.append(('Random Forest', mse_RF))
-R2scores.append(('Random Forest', r2_rf))
+RootMeanSqErr.append(('Rand Forest', mse_RF))
+R2scores.append(('Rand Forest', r2_rf))
 
 #XgBoost
 model_xgb = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, random_state=42)
